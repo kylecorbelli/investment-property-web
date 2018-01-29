@@ -1,15 +1,16 @@
-body {
-  font-family: 'Source Sans Pro', 'Trebuchet MS', 'Lucida Grande', 'Bitstream Vera Sans', 'Helvetica Neue', sans-serif;
+html,
+body,
+div,
+h1,
+h2,
+h3,
+p {
+  box-sizing: border-box;
+  font-family: "HelveticaNeue-Light", "Helvetica Neue Light", "Helvetica Neue", Helvetica, Arial, "Lucida Grande", sans-serif;
   margin: 0;
-  text-align: center;
-  color: #293c4b;
+  padding: 0;
 }
 
-h1 {
-  font-size: 30px;
-}
-
-img {
-  margin: 20px 0;
-  max-width: 200px;
+body {
+  /* background-color: #f5f5f5; */
 }
