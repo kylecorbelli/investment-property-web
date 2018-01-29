@@ -160,3 +160,15 @@ firstYearPrincipalPaydownYield model =
             downPayment model
     in
         Calculate.annualPercentageYield selectedFirstYearPrincipalPaydownAmount selectedDownPayment
+
+
+totalAnnualYield : Model -> Float
+totalAnnualYield model =
+    let
+        selectedTotalAnnualGain =
+            totalAnnualGain model
+
+        selectedDownPayment =
+            downPayment model
+    in
+        Calculate.annualPercentageYield selectedTotalAnnualGain selectedDownPayment
