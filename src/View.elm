@@ -3,7 +3,9 @@ module View exposing (..)
 import Colors exposing (..)
 import Css exposing (..)
 import Css.Media as Media exposing (only, screen, withMedia)
-import Html.Styled exposing (button, div, form, h1, h2, Html, input, p, section, span, table, tbody, td, text, tr)
+import FormatNumber exposing (format)
+import FormatNumber.Locales exposing (Locale, usLocale)
+import Html.Styled exposing (button, div, form, h1, h2, Html, input, p, section, span, table, tbody, td, th, thead, text, tr)
 import Html.Styled.Attributes exposing (css, placeholder, src, type_, value)
 import Html.Styled.Events exposing (onInput, onWithOptions)
 import Json.Decode as Decode
@@ -31,7 +33,7 @@ view model =
 viewInputs : Model -> Html Msg
 viewInputs model =
     section [ css [ inputSectionStyle ] ]
-        [ h2 [] [ text "inputs" ]
+        [ h2 [ css [ sectionHeaderStyle ] ] [ text "inputs" ]
         , form [ onWithOptions "submit" { stopPropagation = True, preventDefault = True } (Decode.succeed CommitInputs), css [ formStyle ] ]
             [ viewInput "Purchase price..." model.purchasePriceFormField UpdatePurchasePriceFormField
             , viewInput "Gross monthly rent..." model.grossMonthlyRentFormField UpdateGrossMonthlyRentFormField
@@ -55,16 +57,16 @@ viewInput placeholderText fieldValue msg =
 viewMonthlyAnalysis : Model -> Html Msg
 viewMonthlyAnalysis model =
     section [ css [ analysisSection, leftSectionStyle ] ]
-        [ h2 [] [ text "monthly cashflow analysis" ]
+        [ h2 [ css [ sectionHeaderStyle ] ] [ text "monthly cashflow analysis" ]
         , Html.Styled.table [ css [ tableStyle ] ]
             [ tbody []
-                [ viewLineItem "gross rent" ( NoUnderline, "" ) ( NoUnderline, model.grossMonthlyRent |> roundedString )
-                , viewLineItem "mortgage principal & interest" ( NoUnderline, Select.mortgagePrincipalAndInterestMonthly model |> roundedString ) ( NoUnderline, "" )
+                [ viewLineItem "gross rent" ( NoUnderline, "" ) ( NoUnderline, model.grossMonthlyRent |> dollarFormat )
+                , viewLineItem "mortgage principal & interest" ( NoUnderline, Select.mortgagePrincipalAndInterestMonthly model |> dollarFormat ) ( NoUnderline, "" )
                 , viewLineItem "taxes & insurance" ( NoUnderline, Select.taxesAndInsuranceMonthlyAmount model |> roundedString ) ( NoUnderline, "" )
                 , viewLineItem "operating expenses" ( NoUnderline, Select.operatingExpensesMonthly model |> roundedString ) ( NoUnderline, "" )
                 , viewLineItem "property management fees" ( SingleUnderline, Select.propertyManagementExpensesMonthly model |> roundedString ) ( NoUnderline, "" )
                 , viewLineItem "total expenses" ( NoUnderline, "" ) ( SingleUnderline, Select.totalMonthlyExpenses model |> roundedString )
-                , viewLineItem "net cashflow" ( NoUnderline, "" ) ( DoubleUnderline, Select.netMonthlyCashflow model |> roundedString )
+                , viewLineItem "net cashflow" ( NoUnderline, "" ) ( DoubleUnderline, Select.netMonthlyCashflow model |> dollarFormat )
                 ]
             ]
         ]
@@ -73,13 +75,25 @@ viewMonthlyAnalysis model =
 viewAnnualYieldAnalysis : Model -> Html Msg
 viewAnnualYieldAnalysis model =
     section [ css [ analysisSection, rightSectionStyle ] ]
-        [ h2 [] [ text "annual yield analysis" ]
+        [ h2 [ css [ sectionHeaderStyle ] ] [ text "annual yield analysis" ]
         , Html.Styled.table [ css [ tableStyle ] ]
             [ tbody []
-                [ viewLineItem "net cashflow" ( NoUnderline, Select.netAnnualCashflow model |> roundedString ) ( NoUnderline, Select.cashOnCashYield model |> roundedString )
-                , viewLineItem "first year appreciation" ( NoUnderline, Select.firstYearAppreciationAmount model |> roundedString ) ( NoUnderline, Select.firstYearAppreciationYield model |> roundedString )
-                , viewLineItem "first year principal paydown" ( SingleUnderline, Select.firstYearPrincipalPaydownAmount model |> roundedString ) ( SingleUnderline, Select.firstYearPrincipalPaydownYield model |> roundedString )
-                , viewLineItem "total gain" ( DoubleUnderline, Select.totalAnnualGain model |> roundedString ) ( DoubleUnderline, Select.totalAnnualYield model |> roundedString )
+                [ viewLineItem "initial investment" ( NoUnderline, "" ) ( NoUnderline, Select.downPayment model |> dollarFormat )
+                ]
+            ]
+        , Html.Styled.table [ css [ tableStyle ] ]
+            [  thead [] 
+                [ tr []
+                    [ th [] []
+                    , th [ css [ thStyle ] ] [ text "amount" ]
+                    , th [ css [ thStyle ] ] [ text "yield" ]
+                    ]
+                ]
+            , tbody []
+                [ viewLineItem "net cashflow" ( NoUnderline, Select.netAnnualCashflow model |> dollarFormat ) ( NoUnderline, Select.cashOnCashYield model |> percentFormat )
+                , viewLineItem "first year appreciation" ( NoUnderline, Select.firstYearAppreciationAmount model |> roundedString ) ( NoUnderline, Select.firstYearAppreciationYield model |> percentFormat )
+                , viewLineItem "first year principal paydown" ( SingleUnderline, Select.firstYearPrincipalPaydownAmount model |> roundedString ) ( SingleUnderline, Select.firstYearPrincipalPaydownYield model |> percentFormat )
+                , viewLineItem "total gain" ( DoubleUnderline, Select.totalAnnualGain model |> dollarFormat ) ( DoubleUnderline, Select.totalAnnualYield model |> percentFormat )
                 ]
             ]
         ]
@@ -123,8 +137,19 @@ viewLineItem label ( underlineStyleOne, firstVal ) ( underlineStyleTwo, secondVa
 
 roundedString : Float -> String
 roundedString =
-    Basics.round >> toString
+    format roundedLocale
 
+roundedLocale : Locale
+roundedLocale =
+    { usLocale | decimals = 0 }
+
+dollarFormat : Float -> String
+dollarFormat =
+    roundedString >> (String.append "$")
+
+percentFormat : Float -> String
+percentFormat =
+    roundedString >> ((flip String.append) "%")
 
 viewValue : String -> number -> Html Msg
 viewValue label value =
@@ -279,6 +304,11 @@ analysisSectionsStyle =
             ]
         ]
 
+sectionHeaderStyle : Style
+sectionHeaderStyle =
+    Css.batch
+        [ marginBottom (em 0.5)
+        ]
 
 analysisSection : Style
 analysisSection =
@@ -305,9 +335,17 @@ rightSectionStyle =
 tableStyle : Style
 tableStyle =
     Css.batch
-        [ width (pct 100)
+        [ marginBottom (em 1)
+        , width (pct 100)
         ]
 
+thStyle : Style
+thStyle =
+    Css.batch
+        [ fontStyle italic
+        , fontWeight (int 300)
+        , textAlign right
+        ]
 
 lineItemValue : Style
 lineItemValue =
