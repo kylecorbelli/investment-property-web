@@ -26,3 +26,11 @@ greenLight =
 greenLightest : Color
 greenLightest =
     hex "#99FFB3"
+
+red : Color
+red =
+    hex "#ff1717"
+
+white : Color
+white =
+    hex "#fff"
