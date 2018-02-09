@@ -1,9 +1,11 @@
 module Main exposing (..)
 
-import Html exposing (button, form, Html, text, div, h1, img, input, p, span)
+import Html exposing (Html)
 import Html.Styled exposing (toUnstyled)
 import Models exposing (Model)
 import Msgs exposing (..)
+import Subscriptions exposing (subscriptions)
+import Update exposing (update)
 import View
 
 
@@ -11,6 +13,8 @@ initialModel : Model
 initialModel =
     { assumedAnnualValueAppreciationRate = 4
     , downPaymentPercent = 30
+    , errorMessage = ""
+    , errorMessageCountdown = 0
     , grossMonthlyRent = 0
     , grossMonthlyRentFormField = ""
     , homeInsuranceAnnualAmount = 2000
@@ -26,42 +30,7 @@ initialModel =
 
 init : ( Model, Cmd Msg )
 init =
-    ( initialModel, Cmd.none )
-
-
-
----- UPDATE ----
-
-
-update : Msg -> Model -> ( Model, Cmd Msg )
-update msg model =
-    case msg of
-        UpdatePurchasePriceFormField purchasePrice ->
-            ( { model | purchasePriceFormField = purchasePrice }, Cmd.none )
-
-        UpdateGrossMonthlyRentFormField grossMonthlyRent ->
-            ( { model | grossMonthlyRentFormField = grossMonthlyRent }, Cmd.none )
-
-        CommitInputs ->
-            let
-                purchasePrice =
-                    model.purchasePriceFormField |> String.toFloat
-
-                grossMonthlyRent =
-                    model.grossMonthlyRentFormField |> String.toFloat
-
-                newModel =
-                    case ( purchasePrice, grossMonthlyRent ) of
-                        ( Ok pp, Ok gmr ) ->
-                            { model
-                                | purchasePrice = pp
-                                , grossMonthlyRent = gmr
-                            }
-
-                        _ ->
-                            model
-            in
-                ( newModel, Cmd.none )
+    initialModel ! []
 
 
 
@@ -74,5 +43,5 @@ main =
         { view = View.view >> toUnstyled
         , init = init
         , update = update
-        , subscriptions = always Sub.none
+        , subscriptions = subscriptions
         }

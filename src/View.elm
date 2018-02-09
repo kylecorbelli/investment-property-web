@@ -12,12 +12,14 @@ import Json.Decode as Decode
 import Models exposing (Model)
 import Msgs exposing (..)
 import Select
+import Views.ErrorMessageBanner exposing (errorMessageBannerView)
 
 
 view : Model -> Html Msg
 view model =
     div [ css [ pageStyle ] ]
-        [ div [ css [ headerStyle ] ]
+        [ errorMessageBannerView model.errorMessage model.errorMessageCountdown
+        , div [ css [ headerStyle ] ]
             [ h1 [ css [ headlineStyle ] ] [ text "income property analysis" ]
             ]
         , div [ css [ contentStyle ] ]
@@ -82,7 +84,7 @@ viewAnnualYieldAnalysis model =
                 ]
             ]
         , Html.Styled.table [ css [ tableStyle ] ]
-            [  thead [] 
+            [ thead []
                 [ tr []
                     [ th [] []
                     , th [ css [ thStyle ] ] [ text "amount" ]
@@ -139,17 +141,21 @@ roundedString : Float -> String
 roundedString =
     format roundedLocale
 
+
 roundedLocale : Locale
 roundedLocale =
     { usLocale | decimals = 0 }
+
 
 dollarFormat : Float -> String
 dollarFormat =
     roundedString >> (String.append "$")
 
+
 percentFormat : Float -> String
 percentFormat =
     roundedString >> ((flip String.append) "%")
+
 
 viewValue : String -> number -> Html Msg
 viewValue label value =
@@ -304,11 +310,13 @@ analysisSectionsStyle =
             ]
         ]
 
+
 sectionHeaderStyle : Style
 sectionHeaderStyle =
     Css.batch
         [ marginBottom (em 0.5)
         ]
+
 
 analysisSection : Style
 analysisSection =
@@ -339,6 +347,7 @@ tableStyle =
         , width (pct 100)
         ]
 
+
 thStyle : Style
 thStyle =
     Css.batch
@@ -346,6 +355,7 @@ thStyle =
         , fontWeight (int 300)
         , textAlign right
         ]
+
 
 lineItemValue : Style
 lineItemValue =

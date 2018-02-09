@@ -3,6 +3,8 @@ module Models exposing (..)
 type alias Model =
   { assumedAnnualValueAppreciationRate: Float
   , downPaymentPercent: Float -- will be 30 instead of 0.3
+  , errorMessage : String
+  , errorMessageCountdown : Int
   , grossMonthlyRent: Float
   , grossMonthlyRentFormField: String
   , homeInsuranceAnnualAmount: Float

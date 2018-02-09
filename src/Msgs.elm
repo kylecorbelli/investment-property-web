@@ -5,3 +5,4 @@ type Msg
     = UpdatePurchasePriceFormField String
     | UpdateGrossMonthlyRentFormField String
     | CommitInputs
+    | AdvanceErrorMessageCountdown
