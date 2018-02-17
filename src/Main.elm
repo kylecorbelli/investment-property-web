@@ -2,17 +2,32 @@ module Main exposing (..)
 
 import Html exposing (Html)
 import Html.Styled exposing (toUnstyled)
-import Models exposing (Model)
+import Models exposing (Environment(..), Model)
 import Msgs exposing (..)
+import RemoteData exposing (RemoteData(..))
 import Subscriptions exposing (subscriptions)
 import Update exposing (update)
 import View
 
 
-initialModel : Model
-initialModel =
+determineEnvironment : String -> Environment
+determineEnvironment environment =
+    case environment of
+        "test" ->
+            Test
+
+        "production" ->
+            Production
+
+        _ ->
+            Development
+
+
+initialModel : Flags -> Model
+initialModel flags =
     { assumedAnnualValueAppreciationRate = 4
     , downPaymentPercent = 30
+    , environment = determineEnvironment flags.environment
     , errorMessage = ""
     , errorMessageCountdown = 0
     , grossMonthlyRent = 0
@@ -25,21 +40,31 @@ initialModel =
     , propertyTaxRate = 1.2
     , purchasePrice = 0
     , purchasePriceFormField = ""
+    , ui =
+        { isModalShown = False
+        }
+    , zillowSearchAddressField = ""
+    , zillowSearchResult = NotAsked
     }
 
 
-init : ( Model, Cmd Msg )
-init =
-    initialModel ! []
+type alias Flags =
+    { environment : String
+    }
+
+
+init : Flags -> ( Model, Cmd Msg )
+init flags =
+    initialModel flags ! []
 
 
 
 ---- PROGRAM ----
 
 
-main : Program Never Model Msg
+main : Program Flags Model Msg
 main =
-    Html.program
+    Html.programWithFlags
         { view = View.view >> toUnstyled
         , init = init
         , update = update

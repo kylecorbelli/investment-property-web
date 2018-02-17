@@ -10,7 +10,7 @@ import Msgs exposing (..)
 errorMessageBannerView : String -> Int -> Html Msg
 errorMessageBannerView errorMessage errorMessageCountdown =
     if errorMessageCountdown > 0 then
-        div [ css [ containerStyle ] ]
+        div [ class "z-5", css [ containerStyle ] ]
             [ i [ class "fas fa-exclamation-triangle" ] []
             , span [ css [ messageStyle ] ] [ text errorMessage ]
             ]
