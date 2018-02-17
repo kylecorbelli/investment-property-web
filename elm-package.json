@@ -11,7 +11,11 @@
         "cuducos/elm-format-number": "5.0.2 <= v < 6.0.0",
         "elm-lang/core": "5.0.0 <= v < 6.0.0",
         "elm-lang/html": "2.0.0 <= v < 3.0.0",
-        "rtfeldman/elm-css": "13.0.1 <= v < 14.0.0"
+        "elm-lang/http": "1.0.0 <= v < 2.0.0",
+        "krisajenkins/remotedata": "4.3.3 <= v < 5.0.0",
+        "rtfeldman/elm-css": "13.0.1 <= v < 14.0.0",
+        "ymtszw/elm-http-xml": "1.0.1 <= v < 2.0.0",
+        "ymtszw/elm-xml-decode": "1.0.1 <= v < 2.0.0"
     },
     "elm-version": "0.18.0 <= v < 0.19.0"
 }
