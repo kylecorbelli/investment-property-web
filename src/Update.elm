@@ -1,6 +1,6 @@
 module Update exposing (update)
 
-import APIs.Zillow exposing (zillowSearchResultRequest)
+import API.Zillow exposing (zillowSearchResultRequest)
 import Constants exposing (errorMessageCountdownSeconds, genericErrorMessage)
 import Http exposing (Error(..))
 import Models exposing (..)

@@ -32,10 +32,6 @@ view model =
                 ]
             ]
         , searchZillowButton
-
-        -- , zillowSearchFormView
-        -- , button [ onClick ZillowSearchResultsRequestSent ] [ text "Send Zillow Request" ]
-        -- , useZillowValuesButton model.zillowSearchResult
         , modal model zillowSearchModalContent DismissZillowModal
         ]
 

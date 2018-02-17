@@ -1,4 +1,4 @@
-module APIs.Constants exposing (..)
+module API.Constants exposing (..)
 
 import Models exposing (Environment(..))
 

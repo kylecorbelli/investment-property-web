@@ -1,6 +1,6 @@
-module APIs.Zillow exposing (..)
+module API.Zillow exposing (..)
 
-import APIs.Constants exposing (baseApiUrl)
+import API.Constants exposing (baseApiUrl)
 import Http.Xml
 import Models exposing (..)
 import Msgs exposing (..)
@@ -56,12 +56,3 @@ zillowSearchResultRequest environment address =
         |> (flip Http.Xml.get) zillowSearchResultDecoder
         |> sendRequest
         |> Cmd.map ZillowSearchResultsRequestCompleted
-
-
-
--- Cmd.map ZillowSearchResultsRequestCompleted << sendRequest << (flip Http.Xml.get) zillowSearchResultDecoder << (zillowSearchResultUrl environment)
--- let
---     request =
---         Http.Xml.get (zillowSearchResultUrl address) zillowSearchResultDecoder
--- in
---     Cmd.map ZillowSearchResultsRequestCompleted << sendRequest <| request

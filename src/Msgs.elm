@@ -10,7 +10,7 @@ type Msg
     | AdvanceErrorMessageCountdown
     | UpdateZillowSearchAddressField String
     | ZillowSearchResultsRequestSent
-    | ZillowSearchResultsRequestCompleted (WebData ZillowSearchResult) -- again, probably use RemoteData
+    | ZillowSearchResultsRequestCompleted (WebData ZillowSearchResult)
     | UseZillowDataInAnalysis
     | ToggleModal
     | DismissZillowModal
