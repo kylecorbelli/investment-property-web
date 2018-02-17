@@ -7,6 +7,7 @@
     "test": "tests"
   },
   "scripts": {
+    "deploy": "elm-app build && cp build/index.html build/200.html && surge build --domain income-property-analysis.surge.sh",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "repository": {
