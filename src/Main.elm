@@ -25,7 +25,7 @@ determineEnvironment environment =
 
 initialModel : Flags -> Model
 initialModel flags =
-    { assumedAnnualValueAppreciationRate = 4
+    { assumedAnnualValueAppreciationRate = 2
     , downPaymentPercent = 30
     , environment = determineEnvironment flags.environment
     , errorMessage = ""

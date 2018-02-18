@@ -1,9 +1,5 @@
 module View exposing (..)
 
-import Colors exposing (..)
-import Css exposing (..)
-import Css.Media as Media exposing (only, screen, withMedia)
-import Debug
 import FormatNumber exposing (format)
 import FormatNumber.Locales exposing (Locale, usLocale)
 import Html.Styled exposing (button, div, form, h1, h2, h3, Html, i, img, input, label, p, section, span, table, tbody, td, th, thead, text, tr)
@@ -15,18 +11,19 @@ import Msgs exposing (..)
 import Select
 import Views.ErrorMessageBanner exposing (errorMessageBannerView)
 import RemoteData exposing (RemoteData(..), WebData)
+import Regex exposing (HowMany(All), replace, regex)
 
 
 view : Model -> Html Msg
 view model =
-    div [ css [ pageStyle ] ]
+    div [ class "flex flex-column items-center" ]
         [ errorMessageBannerView model.errorMessage model.errorMessageCountdown
-        , div [ css [ headerStyle ] ]
-            [ h1 [ css [ headlineStyle ] ] [ text "income property analysis" ]
+        , div [ class "bg-black flex justify-center justify-start-ns mb4 pa3 w-100" ]
+            [ h1 [ class "f3 fw1 helvetica light-green" ] [ text "income property analysis" ]
             ]
-        , div [ css [ contentStyle ] ]
+        , div [ class "mw7 pa3 w-100" ]
             [ viewInputs model
-            , div [ css [ analysisSectionsStyle ] ]
+            , div [ class "flex flex-column flex-row-ns justify-between" ]
                 [ viewMonthlyAnalysis model
                 , viewAnnualYieldAnalysis model
                 ]
@@ -46,33 +43,38 @@ onSubmit msg =
 
 viewInputs : Model -> Html Msg
 viewInputs model =
-    section [ css [ inputSectionStyle ] ]
-        [ h2 [ css [ sectionHeaderStyle ] ] [ text "inputs" ]
-        , form [ onSubmit CommitInputs, css [ formStyle ] ]
-            [ viewInput "Purchase price..." model.purchasePriceFormField UpdatePurchasePriceFormField
-            , viewInput "Gross monthly rent..." model.grossMonthlyRentFormField UpdateGrossMonthlyRentFormField
-            , button [ css [ buttonStyle ], type_ "submit" ] [ text "analyze" ]
+    section [ class "mb5" ]
+        [ h2 [ class "mb3" ] [ text "inputs" ]
+        , form [ onSubmit CommitInputs, class "flex flex-column flex-row-ns" ]
+            [ viewInput "purchase price" "" model.purchasePriceFormField UpdatePurchasePriceFormField
+            , viewInput "gross monthly rent" "" model.grossMonthlyRentFormField UpdateGrossMonthlyRentFormField
+            , button [ class "bg-green bn cl f5 hover-bg-dark-green outline-0 pa3 pa1-ns pointer w-100 w-20-ns white", type_ "submit" ] [ text "analyze" ]
             ]
         ]
 
 
-viewInput : String -> String -> (String -> Msg) -> Html Msg
-viewInput placeholderText fieldValue msg =
-    input
-        [ css [ inputStyle ]
-        , onInput msg
-        , placeholder placeholderText
-        , type_ "number"
-        , value fieldValue
+viewInput : String -> String -> String -> (String -> Msg) -> Html Msg
+viewInput labelText placeholderText fieldValue msg =
+    div [ class "fl mb3 mb0-ns pr3-ns w-100 w-40-ns" ]
+        [ label [ class "" ]
+            [ text labelText
+            , input
+                [ class "bt-0 bl-0 br-0 bb bb-1 b--gray f4 fw1 mt2 outline-0 w-100"
+                , onInput msg
+                , placeholder placeholderText
+                , type_ "number"
+                , value fieldValue
+                ]
+                []
+            ]
         ]
-        []
 
 
 viewMonthlyAnalysis : Model -> Html Msg
 viewMonthlyAnalysis model =
-    section [ css [ analysisSection, leftSectionStyle ] ]
-        [ h2 [ css [ sectionHeaderStyle ] ] [ text "monthly cashflow analysis" ]
-        , Html.Styled.table [ css [ tableStyle ] ]
+    section [ class "mb4 pr3-ns w-100 w-50-ns" ]
+        [ h2 [ class "mb3" ] [ text "monthly cashflow analysis" ]
+        , Html.Styled.table [ class "mb1 w-100" ]
             [ tbody []
                 [ viewLineItem "gross rent" ( NoUnderline, "" ) ( NoUnderline, model.grossMonthlyRent |> dollarFormat )
                 , viewLineItem "mortgage principal & interest" ( NoUnderline, Select.mortgagePrincipalAndInterestMonthly model |> dollarFormat ) ( NoUnderline, "" )
@@ -88,19 +90,19 @@ viewMonthlyAnalysis model =
 
 viewAnnualYieldAnalysis : Model -> Html Msg
 viewAnnualYieldAnalysis model =
-    section [ css [ analysisSection, rightSectionStyle ] ]
-        [ h2 [ css [ sectionHeaderStyle ] ] [ text "annual yield analysis" ]
-        , Html.Styled.table [ css [ tableStyle ] ]
+    section [ class "mb4 pl3-ns w-100 w-50-ns" ]
+        [ h2 [ class "mb3" ] [ text "annual yield analysis" ]
+        , Html.Styled.table [ class "mb3 w-100" ]
             [ tbody []
                 [ viewLineItem "initial investment" ( NoUnderline, "" ) ( NoUnderline, Select.downPayment model |> dollarFormat )
                 ]
             ]
-        , Html.Styled.table [ css [ tableStyle ] ]
+        , Html.Styled.table [ class "mb1 w-100" ]
             [ thead []
                 [ tr []
                     [ th [] []
-                    , th [ css [ thStyle ] ] [ text "amount" ]
-                    , th [ css [ thStyle ] ] [ text "yield" ]
+                    , th [ class "fw3 i tr" ] [ text "amount" ]
+                    , th [ class "fw3 i tr" ] [ text "yield" ]
                     ]
                 ]
             , tbody []
@@ -122,30 +124,30 @@ type UnderlineStyle
 viewLineItem : String -> ( UnderlineStyle, String ) -> ( UnderlineStyle, String ) -> Html Msg
 viewLineItem label ( underlineStyleOne, firstVal ) ( underlineStyleTwo, secondVal ) =
     let
-        noClass =
-            Css.batch []
+        noClasses =
+            ""
 
-        determineUnderlineClass underlineStyle =
+        determineUnderlineClasses underlineStyle =
             case underlineStyle of
                 SingleUnderline ->
-                    underlinedCell
+                    "bb"
 
                 DoubleUnderline ->
-                    doubleUnderlinedCell
+                    "re-bbs-double"
 
                 NoUnderline ->
-                    noClass
+                    noClasses
 
-        underlineClassOne =
-            determineUnderlineClass underlineStyleOne
+        underlineClassesOne =
+            determineUnderlineClasses underlineStyleOne
 
-        underlineClassTwo =
-            determineUnderlineClass underlineStyleTwo
+        underlineClassesTwo =
+            determineUnderlineClasses underlineStyleTwo
     in
         tr []
             [ td [] [ text label ]
-            , td [ css [ lineItemValue, underlineClassOne ] ] [ text firstVal ]
-            , td [ css [ lineItemValue, underlineClassTwo ] ] [ text secondVal ]
+            , td [ class <| "tr" ++ " " ++ underlineClassesOne ] [ text firstVal ]
+            , td [ class <| "tr" ++ " " ++ underlineClassesTwo ] [ text secondVal ]
             ]
 
 
@@ -160,8 +162,17 @@ roundedLocale =
 
 
 dollarFormat : Float -> String
-dollarFormat =
-    roundedString >> (String.append "$")
+dollarFormat value =
+    let
+        removeNegativeSign =
+            replace All (regex "−") (always "")
+    in
+        case value < 0 of
+            True ->
+                "($" ++ (removeNegativeSign << roundedString <| value) ++ ")"
+
+            False ->
+                "$" ++ roundedString value
 
 
 percentFormat : Float -> String
@@ -179,7 +190,7 @@ viewValue label value =
 
 searchZillowButton : Html Msg
 searchZillowButton =
-    button [ class "bg-green bw0 hover-bg-dark-green outline-0 ph3 pv2 pointer white", onClick ToggleModal ] [ text "Analyze Property by Address" ]
+    button [ class "ba b--green bg-green bw0 f5 hover-bg-dark-green outline-0 pa3 pointer white", onClick ToggleModal ] [ text "load property by address" ]
 
 
 modal : Model -> (Model -> Html Msg) -> Msg -> Html Msg
@@ -209,14 +220,14 @@ zillowSearchModalContent model =
                     zillowSearchResultsSuccessView zillowSearchResult
 
                 Loading ->
-                    div [ class "items-center flex flex-column justify-center"]
+                    div [ class "items-center flex flex-column justify-center" ]
                         [ img [ src "/spinner.gif", class "h3 mb3" ] []
                         , p [ class "f4" ] [ text "searching..." ]
                         ]
 
                 _ ->
                     div []
-                        [ h2 [ class "h2 mb4 tc" ] [ text "Search For a Property" ]
+                        [ h2 [ class "h2 mb4 tc" ] [ text "search for a property" ]
                         , zillowSearchFormView
                         ]
     in
@@ -229,7 +240,7 @@ zillowSearchModalContent model =
 zillowSearchResultsSuccessView : ZillowSearchResult -> Html Msg
 zillowSearchResultsSuccessView { address, bathroomCount, bedroomCount, rentZestimateData, squareFootage, zestimateData } =
     div [ class "tc" ]
-        [ h2 [ class "h2 mb4 tc" ] [ text "Search Results" ]
+        [ h2 [ class "h2 mb4 tc" ] [ text "search results" ]
         , div [ class "cf mb4" ]
             [ div [ class "fl w-100 w-third-ns tc tl-ns mb3 mb0-ns" ]
                 [ h3 [] [ text address.street ]
@@ -248,8 +259,8 @@ zillowSearchResultsSuccessView { address, bathroomCount, bedroomCount, rentZesti
                 ]
             ]
         , div [ class "cf flex-ns justify-between-ns" ]
-            [ button [ class "bw1 hover-bg-light-gray b--light-gray gray mb3 mb0-ns outline-0 ph3 pv2 pointer w-100 w-40-ns", onClick DismissZillowSearchResult ] [ text "Search Again" ]
-            , button [ class "bg-green bw0 hover-bg-dark-green outline-0 ph3 pv2 pointer white w-100 w-40-ns", onClick UseZillowDataInAnalysis ] [ text "Load This Property" ]
+            [ button [ class "bw1 hover-bg-light-gray b--light-gray gray mb3 mb0-ns outline-0 ph3 pv2 pointer w-100 w-40-ns", onClick DismissZillowSearchResult ] [ text "search again" ]
+            , button [ class "bg-green bw0 hover-bg-dark-green outline-0 ph3 pv2 pointer white w-100 w-40-ns", onClick UseZillowDataInAnalysis ] [ text "load this property" ]
             ]
         ]
 
@@ -270,216 +281,3 @@ useZillowValuesButton zillowSearchResult =
 
         _ ->
             text ""
-
-
-
--- CSS
-
-
-headerStyle : Style
-headerStyle =
-    Css.batch
-        [ backgroundColor greenDarkest
-        , displayFlex
-        , justifyContent center
-        , marginBottom (em 2)
-        , padding (em 1)
-        , width (pct 100)
-        ]
-
-
-
--- Get this somewhere more convenient:
-
-
-breakPointMin : Float -> List Style -> Style
-breakPointMin pixels styles =
-    withMedia [ only screen [ Media.minWidth (px pixels) ] ] styles
-
-
-fromTablet : List Style -> Style
-fromTablet =
-    breakPointMin 600
-
-
-fromDesktop : List Style -> Style
-fromDesktop =
-    breakPointMin 1000
-
-
-redBorder : Style
-redBorder =
-    border3 (px 1) solid (hex "#ff0000")
-
-
-pageStyle : Style
-pageStyle =
-    Css.batch
-        [ alignItems center
-        , displayFlex
-        , flexDirection column
-        , minHeight (vh 100)
-        ]
-
-
-headlineStyle : Style
-headlineStyle =
-    Css.batch
-        [ color greenLightest
-        , flexGrow (int 1)
-        , fontFamilies [ "Helvetica Neue" ]
-        , fontSize (em 1.75)
-        , fontWeight (int 100)
-        , textAlign center
-        , fromTablet
-            [ textAlign left
-            ]
-        ]
-
-
-contentStyle : Style
-contentStyle =
-    Css.batch
-        [ padding (em 1)
-        , maxWidth (px 960)
-        , width (pct 100)
-        ]
-
-
-inputSectionStyle : Style
-inputSectionStyle =
-    Css.batch
-        [ marginBottom (em 3)
-        ]
-
-
-formStyle : Style
-formStyle =
-    Css.batch
-        [ alignItems stretch
-        , displayFlex
-        , flexDirection column
-        , justifyContent spaceBetween
-        , fromTablet
-            [ alignItems flexEnd
-            , flexDirection row
-            ]
-        ]
-
-
-inputStyle : Style
-inputStyle =
-    Css.batch
-        [ backgroundColor transparent
-        , border (px 0)
-        , borderBottom3 (px 1) solid greenMedium
-        , color greenDarkest
-        , flexBasis (pct 40)
-        , fontSize (em 1.5)
-        , fontWeight (int 100)
-        , marginBottom (em 1)
-        , outline none
-        , fromTablet
-            [ marginBottom (px 0)
-            ]
-        ]
-
-
-buttonStyle : Style
-buttonStyle =
-    Css.batch
-        [ backgroundColor greenLight
-        , border (px 0)
-        , color (hex "#fff")
-        , cursor pointer
-        , fontSize (em 1.5)
-        , fontWeight (int 100)
-        , hover
-            [ backgroundColor greenLightest
-            ]
-        , outline none
-        , padding (em 0.5)
-        , fromTablet
-            [ padding2 (em 0.25) (em 0.5)
-            ]
-        ]
-
-
-analysisSectionsStyle : Style
-analysisSectionsStyle =
-    Css.batch
-        [ displayFlex
-        , flexDirection column
-        , justifyContent spaceBetween
-        , width (pct 100)
-        , fromTablet
-            [ flexDirection row
-            ]
-        ]
-
-
-sectionHeaderStyle : Style
-sectionHeaderStyle =
-    Css.batch
-        [ marginBottom (em 0.5)
-        ]
-
-
-analysisSection : Style
-analysisSection =
-    Css.batch
-        [ flexGrow (int 1)
-        , marginBottom (em 2)
-        ]
-
-
-leftSectionStyle : Style
-leftSectionStyle =
-    Css.batch
-        [ fromTablet [ paddingRight (em 2) ]
-        ]
-
-
-rightSectionStyle : Style
-rightSectionStyle =
-    Css.batch
-        [ fromTablet [ paddingLeft (em 2) ]
-        ]
-
-
-tableStyle : Style
-tableStyle =
-    Css.batch
-        [ marginBottom (em 1)
-        , width (pct 100)
-        ]
-
-
-thStyle : Style
-thStyle =
-    Css.batch
-        [ fontStyle italic
-        , fontWeight (int 300)
-        , textAlign right
-        ]
-
-
-lineItemValue : Style
-lineItemValue =
-    Css.batch
-        [ textAlign right
-        ]
-
-
-underlinedCell : Style
-underlinedCell =
-    Css.batch
-        [ borderBottom3 (px 1) solid greenDarkest
-        ]
-
-
-doubleUnderlinedCell : Style
-doubleUnderlinedCell =
-    Css.batch
-        [ borderBottom3 (px 3) double greenDarkest
-        ]
