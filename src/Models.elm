@@ -1,22 +1,22 @@
 module Models exposing (..)
 
-
 import RemoteData exposing (WebData)
 
 
 type alias ZillowAddress =
     { street : String
     , zipCode : String
-    , city: String
+    , city : String
     , state : String
     , latitude : Float
     , longitude : Float
     }
 
+
 type alias ZillowZestimateData =
     { amount : Int
-    , high: Int
-    , low: Int
+    , high : Int
+    , low : Int
     }
 
 
@@ -30,14 +30,23 @@ type alias ZillowSearchResult =
     , zestimateData : ZillowZestimateData
     }
 
+
 type alias UIModel =
     { isModalShown : Bool
     }
+
 
 type Environment
     = Development
     | Production
     | Test
+
+
+type UnderlineStyle
+    = SingleUnderline
+    | DoubleUnderline
+    | NoUnderline
+
 
 type alias Model =
     { assumedAnnualValueAppreciationRate : Float
@@ -55,7 +64,7 @@ type alias Model =
     , propertyTaxRate : Float
     , purchasePrice : Float
     , purchasePriceFormField : String
-    , ui: UIModel
+    , ui : UIModel
     , zillowSearchAddressField : String
     , zillowSearchResult : WebData ZillowSearchResult
     }

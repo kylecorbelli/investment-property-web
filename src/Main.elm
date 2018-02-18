@@ -7,7 +7,7 @@ import Msgs exposing (..)
 import RemoteData exposing (RemoteData(..))
 import Subscriptions exposing (subscriptions)
 import Update exposing (update)
-import View
+import View.Main exposing (view)
 
 
 determineEnvironment : String -> Environment
@@ -65,7 +65,7 @@ init flags =
 main : Program Flags Model Msg
 main =
     Html.programWithFlags
-        { view = View.view >> toUnstyled
+        { view = view >> toUnstyled
         , init = init
         , update = update
         , subscriptions = subscriptions
