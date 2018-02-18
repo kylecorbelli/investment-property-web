@@ -1,4 +1,4 @@
-module Views.ErrorMessageBanner exposing (..)
+module View.ErrorMessageBanner exposing (..)
 
 import Colors exposing (red, white)
 import Css exposing (..)

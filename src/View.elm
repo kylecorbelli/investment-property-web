@@ -6,10 +6,11 @@ import Html.Styled exposing (button, div, form, h1, h2, h3, Html, i, img, input,
 import Html.Styled.Attributes exposing (class, css, placeholder, src, type_, value)
 import Html.Styled.Events exposing (onClick, onInput, onWithOptions)
 import Json.Decode as Decode
+import View.Modal exposing (modal)
 import Models exposing (Model, ZillowSearchResult)
 import Msgs exposing (..)
 import Select
-import Views.ErrorMessageBanner exposing (errorMessageBannerView)
+import View.ErrorMessageBanner exposing (errorMessageBannerView)
 import RemoteData exposing (RemoteData(..), WebData)
 import Regex exposing (HowMany(All), replace, regex)
 
@@ -46,8 +47,8 @@ viewInputs model =
     section [ class "mb5" ]
         [ h2 [ class "mb3" ] [ text "inputs" ]
         , form [ onSubmit CommitInputs, class "flex flex-column flex-row-ns" ]
-            [ viewInput "purchase price" "" model.purchasePriceFormField UpdatePurchasePriceFormField
-            , viewInput "gross monthly rent" "" model.grossMonthlyRentFormField UpdateGrossMonthlyRentFormField
+            [ viewInput "purchase price:" "" model.purchasePriceFormField UpdatePurchasePriceFormField
+            , viewInput "gross monthly rent:" "" model.grossMonthlyRentFormField UpdateGrossMonthlyRentFormField
             , button [ class "bg-green bn cl f5 hover-bg-dark-green outline-0 pa3 pa1-ns pointer w-100 w-20-ns white", type_ "submit" ] [ text "analyze" ]
             ]
         ]
@@ -192,23 +193,6 @@ searchZillowButton : Html Msg
 searchZillowButton =
     button [ class "ba b--green bg-green bw0 f5 hover-bg-dark-green outline-0 pa3 pointer white", onClick ToggleModal ] [ text "load property by address" ]
 
-
-modal : Model -> (Model -> Html Msg) -> Msg -> Html Msg
-modal model viewFunction onDismiss =
-    let
-        displayClass =
-            if model.ui.isModalShown then
-                "flex"
-            else
-                "dn"
-
-        containerClasses =
-            "bottom-0 fixed items-center justify-center left-0 right-0 top-0" ++ " " ++ displayClass
-    in
-        div [ class containerClasses ]
-            [ div [ class "bg-white flex items-center justify-center mw7 relative w-90 z-4" ] [ viewFunction model ]
-            , div [ class "bg-black bottom-0 fixed left-0 o-80 right-0 top-0 z-1", onClick onDismiss ] []
-            ]
 
 
 zillowSearchModalContent : Model -> Html Msg
