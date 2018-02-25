@@ -33,6 +33,7 @@ containerStyle =
         , right (px 0)
         ]
 
+
 messageStyle : Style
 messageStyle =
     Css.batch

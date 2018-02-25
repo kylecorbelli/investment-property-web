@@ -44,6 +44,26 @@ mortgagePrincipalAndInterestMonthly model =
         Calculate.mortgagePrincipalAndInterestMonthly model.interestRate term selectedMortgageAmount
 
 
+vacancyAllowanceMonthly : Model -> Float
+vacancyAllowanceMonthly { grossMonthlyRent, vacancyRate } =
+    Calculate.vacancyAllowanceMonthly grossMonthlyRent vacancyRate
+
+
+netMonthlyRent : Model -> Float
+netMonthlyRent { grossMonthlyRent, vacancyRate } =
+    Calculate.netMonthlyRent grossMonthlyRent vacancyRate
+
+
+capitalExpendituresExpenseMonthly : Model -> Float
+capitalExpendituresExpenseMonthly { grossMonthlyRent, capitalExpendituresExpensePercent } =
+    Calculate.capitalExpendituresExpenseMonthly grossMonthlyRent capitalExpendituresExpensePercent
+
+
+repairsAndMaintenanceExpenseMonthly : Model -> Float
+repairsAndMaintenanceExpenseMonthly { grossMonthlyRent, repairsAndMaintenanceExpensePercent } =
+    Calculate.repairsAndMaintenanceExpenseMonthly grossMonthlyRent repairsAndMaintenanceExpensePercent
+
+
 operatingExpensesMonthly : Model -> Float
 operatingExpensesMonthly { grossMonthlyRent, operatingExpensePercent } =
     Calculate.operatingExpensesMonthly grossMonthlyRent operatingExpensePercent
@@ -57,28 +77,47 @@ propertyManagementExpensesMonthly { grossMonthlyRent, propertyManagementFeePerce
 totalMonthlyExpenses : Model -> Float
 totalMonthlyExpenses model =
     let
-        selectedMortgagePrincipalAndInterestMonthly =
-            mortgagePrincipalAndInterestMonthly model
-
         selectedTaxesAndInsuranceMonthlyAmount =
             taxesAndInsuranceMonthlyAmount model
 
-        selectedOperatingExpensesMonthly =
-            operatingExpensesMonthly model
+        selectedCapitalExpendituresExpenseMonthly =
+            capitalExpendituresExpenseMonthly model
+
+        selectedRepairsAndMaintenanceExpenseMonthly =
+            repairsAndMaintenanceExpenseMonthly model
 
         selectedPropertyManagementExpensesMonthly =
             propertyManagementExpensesMonthly model
     in
-        Calculate.totalMonthlyExpenses selectedMortgagePrincipalAndInterestMonthly selectedTaxesAndInsuranceMonthlyAmount selectedOperatingExpensesMonthly selectedPropertyManagementExpensesMonthly
+        Calculate.totalMonthlyExpenses
+            selectedTaxesAndInsuranceMonthlyAmount
+            selectedCapitalExpendituresExpenseMonthly
+            selectedRepairsAndMaintenanceExpenseMonthly
+            selectedPropertyManagementExpensesMonthly
+
+
+netMonthlyOperatingIncome : Model -> Float
+netMonthlyOperatingIncome model =
+    let
+        selectedNetMonthlyRent =
+            netMonthlyRent model
+
+        selectedTotalMonthlyExpenses =
+            totalMonthlyExpenses model
+    in
+        Calculate.netMonthlyOperatingIncome selectedNetMonthlyRent selectedTotalMonthlyExpenses
 
 
 netMonthlyCashflow : Model -> Float
 netMonthlyCashflow model =
     let
-        selectedTotalMonthlyExpenses =
-            totalMonthlyExpenses model
+        selectedNetMonthlyOperatingIncome =
+            netMonthlyOperatingIncome model
+
+        selectedMortgagePrincipalAndInterestMonthly =
+            mortgagePrincipalAndInterestMonthly model
     in
-        Calculate.netMonthlyCashflow model.grossMonthlyRent selectedTotalMonthlyExpenses
+        Calculate.netMonthlyCashflow selectedNetMonthlyOperatingIncome selectedMortgagePrincipalAndInterestMonthly
 
 
 netAnnualCashflow : Model -> Float
@@ -88,6 +127,36 @@ netAnnualCashflow model =
             netMonthlyCashflow model
     in
         selectedNetMonthlyCashflow * 12
+
+
+grossRentMultiplier : Model -> Float
+grossRentMultiplier { grossMonthlyRent, purchasePrice } =
+    let
+        grossAnnualRent =
+            grossMonthlyRent * 12
+    in
+        Calculate.grossRentMultiplier purchasePrice grossAnnualRent
+
+
+capitalizationRate : Model -> Float
+capitalizationRate model =
+    let
+        netOperatingIncomeAnnual =
+            12 * netMonthlyOperatingIncome model
+    in
+        Calculate.capitalizationRate netOperatingIncomeAnnual model.purchasePrice
+
+
+debtCoverageRatio : Model -> Float
+debtCoverageRatio model =
+    let
+        netOperatingIncome =
+            netMonthlyOperatingIncome model
+
+        debtService =
+            mortgagePrincipalAndInterestMonthly model
+    in
+        Calculate.debtCoverageRatio netOperatingIncome debtService
 
 
 firstYearAppreciationAmount : Model -> Float

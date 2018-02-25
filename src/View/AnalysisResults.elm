@@ -5,31 +5,38 @@ import Html.Styled.Attributes exposing (class)
 import Models exposing (Model, UnderlineStyle(..))
 import Msgs exposing (Msg)
 import Select
-import View.Utilities exposing (dollarFormat, percentFormat, roundedString)
+import View.Utilities exposing (dollarFormat, inParens, percentFormat, roundedString)
 
 
-viewMonthlyAnalysis : Model -> Html Msg
-viewMonthlyAnalysis model =
+viewMonthlyOperatingIncomeAnalysis : Model -> Html Msg
+viewMonthlyOperatingIncomeAnalysis model =
     section [ class "mb4 pr3-ns w-100 w-50-ns" ]
-        [ h2 [ class "mb3" ] [ text "monthly cashflow analysis" ]
+        [ h2 [ class "mb3" ] [ text "monthly operating income" ]
         , Html.Styled.table [ class "mb1 w-100" ]
             [ tbody []
-                [ viewLineItem "gross rent" ( NoUnderline, "" ) ( NoUnderline, model.grossMonthlyRent |> dollarFormat )
-                , viewLineItem "mortgage principal & interest" ( NoUnderline, Select.mortgagePrincipalAndInterestMonthly model |> dollarFormat ) ( NoUnderline, "" )
-                , viewLineItem "taxes & insurance" ( NoUnderline, Select.taxesAndInsuranceMonthlyAmount model |> roundedString ) ( NoUnderline, "" )
-                , viewLineItem "operating expenses" ( NoUnderline, Select.operatingExpensesMonthly model |> roundedString ) ( NoUnderline, "" )
-                , viewLineItem "property management fees" ( SingleUnderline, Select.propertyManagementExpensesMonthly model |> roundedString ) ( NoUnderline, "" )
-                , viewLineItem "total expenses" ( NoUnderline, "" ) ( SingleUnderline, Select.totalMonthlyExpenses model |> roundedString )
-                , viewLineItem "net cashflow" ( NoUnderline, "" ) ( DoubleUnderline, Select.netMonthlyCashflow model |> dollarFormat )
+                [ viewLineItem "gross rent" ( NoUnderline, model.grossMonthlyRent |> dollarFormat ) ( NoUnderline, "" )
+                , viewLineItem "vacancy allowance" ( SingleUnderline, roundedString 0 << Select.vacancyAllowanceMonthly <| model ) ( NoUnderline, "" )
+                , viewLineItem "net rent" ( NoUnderline, "" ) ( NoUnderline, dollarFormat << Select.netMonthlyRent <| model )
+                , viewLineItem "taxes & insurance" ( NoUnderline, dollarFormat << Select.taxesAndInsuranceMonthlyAmount <| model ) ( NoUnderline, "" )
+                , viewLineItem "capital expenditures" ( NoUnderline, roundedString 0 << Select.capitalExpendituresExpenseMonthly <| model ) ( NoUnderline, "" )
+                , viewLineItem "repairs & maintenence" ( NoUnderline, roundedString 0 << Select.repairsAndMaintenanceExpenseMonthly <| model ) ( NoUnderline, "" )
+                , viewLineItem "property management fees" ( SingleUnderline, Select.propertyManagementExpensesMonthly model |> roundedString 0 ) ( NoUnderline, "" )
+                , viewLineItem "total expenses" ( NoUnderline, "" ) ( SingleUnderline, Select.totalMonthlyExpenses model |> roundedString 0 )
+                , viewLineItem "net operating income" ( NoUnderline, "" ) ( DoubleUnderline, Select.netMonthlyOperatingIncome model |> dollarFormat )
                 ]
             ]
         ]
 
 
+
+-- , viewLineItem "operating expenses" ( NoUnderline, Select.operatingExpensesMonthly model |> roundedString 0 ) ( NoUnderline, "" )
+-- , viewLineItem "mortgage principal & interest" ( NoUnderline, Select.mortgagePrincipalAndInterestMonthly model |> dollarFormat ) ( NoUnderline, "" )
+
+
 viewAnnualYieldAnalysis : Model -> Html Msg
 viewAnnualYieldAnalysis model =
-    section [ class "mb4 pl3-ns w-100 w-50-ns" ]
-        [ h2 [ class "mb3" ] [ text "annual yield analysis" ]
+    section [ class "mb4 pr3-ns w-100 w-50-ns" ]
+        [ h2 [ class "mb3" ] [ text "annual yield" ]
         , Html.Styled.table [ class "mb3 w-100" ]
             [ tbody []
                 [ viewLineItem "initial investment" ( NoUnderline, "" ) ( NoUnderline, Select.downPayment model |> dollarFormat )
@@ -44,11 +51,37 @@ viewAnnualYieldAnalysis model =
                     ]
                 ]
             , tbody []
-                [ viewLineItem "net cashflow" ( NoUnderline, Select.netAnnualCashflow model |> dollarFormat ) ( NoUnderline, Select.cashOnCashYield model |> percentFormat )
-                , viewLineItem "first year appreciation" ( NoUnderline, Select.firstYearAppreciationAmount model |> roundedString ) ( NoUnderline, Select.firstYearAppreciationYield model |> percentFormat )
-                , viewLineItem "first year principal paydown" ( SingleUnderline, Select.firstYearPrincipalPaydownAmount model |> roundedString ) ( SingleUnderline, Select.firstYearPrincipalPaydownYield model |> percentFormat )
-                , viewLineItem "total gain" ( DoubleUnderline, Select.totalAnnualGain model |> dollarFormat ) ( DoubleUnderline, Select.totalAnnualYield model |> percentFormat )
+                [ viewLineItem "cashflow" ( NoUnderline, Select.netAnnualCashflow model |> dollarFormat ) ( NoUnderline, Select.cashOnCashYield model |> percentFormat 0 )
+                , viewLineItem "first year appreciation" ( NoUnderline, Select.firstYearAppreciationAmount model |> roundedString 0 ) ( NoUnderline, Select.firstYearAppreciationYield model |> percentFormat 0 )
+                , viewLineItem "first year principal paydown" ( SingleUnderline, Select.firstYearPrincipalPaydownAmount model |> roundedString 0 ) ( SingleUnderline, Select.firstYearPrincipalPaydownYield model |> percentFormat 0 )
+                , viewLineItem "total gain" ( DoubleUnderline, Select.totalAnnualGain model |> dollarFormat ) ( DoubleUnderline, Select.totalAnnualYield model |> percentFormat 0 )
                 ]
+            ]
+        ]
+
+
+viewMonthlyCashFlowAnalysis : Model -> Html Msg
+viewMonthlyCashFlowAnalysis model =
+    section [ class "mb4 pl3-ns w-100 w-50-ns" ]
+        [ h2 [ class "mb3" ] [ text "monthly cashflow" ]
+        , Html.Styled.table [ class "mb3 w-100" ]
+            [ tbody []
+                [ viewLineItem "net operating income" ( NoUnderline, "" ) ( NoUnderline, dollarFormat << Select.netMonthlyOperatingIncome <| model )
+                , viewLineItem "mortgage principal & interest" ( NoUnderline, "" ) ( SingleUnderline, roundedString 0 << Select.mortgagePrincipalAndInterestMonthly <| model )
+                , viewLineItem "cashflow" ( NoUnderline, "" ) ( DoubleUnderline, dollarFormat << Select.netMonthlyCashflow <| model )
+                ]
+            ]
+        ]
+
+
+viewPropertyMetrics : Model -> Html Msg
+viewPropertyMetrics model =
+    section [ class "mb4 pl3-ns w-100 w-50-ns" ]
+        [ h2 [ class "mb3" ] [ text "metrics" ]
+        , Html.Styled.table [ class "mb3 w-100" ]
+            [ viewLineItem "gross rent multiplier" ( NoUnderline, "" ) ( NoUnderline, roundedString 2 << Select.grossRentMultiplier <| model )
+            , viewLineItem "capitalization rate" ( NoUnderline, "" ) ( NoUnderline, percentFormat 1 << Select.capitalizationRate <| model )
+            , viewLineItem "debt coverage ratio" ( NoUnderline, "" ) ( NoUnderline, roundedString 2 << Select.debtCoverageRatio <| model )
             ]
         ]
 

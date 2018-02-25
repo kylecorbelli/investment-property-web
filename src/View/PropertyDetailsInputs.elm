@@ -7,6 +7,7 @@ import Models exposing (Model)
 import Msgs exposing (Msg(..))
 import View.Utilities exposing (onSubmit)
 
+
 viewInputs : Model -> Html Msg
 viewInputs model =
     section [ class "mb5" ]

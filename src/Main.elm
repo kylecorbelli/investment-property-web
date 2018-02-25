@@ -26,6 +26,7 @@ determineEnvironment environment =
 initialModel : Flags -> Model
 initialModel flags =
     { assumedAnnualValueAppreciationRate = 2
+    , capitalExpendituresExpensePercent = 10
     , downPaymentPercent = 30
     , environment = determineEnvironment flags.environment
     , errorMessage = ""
@@ -40,9 +41,11 @@ initialModel flags =
     , propertyTaxRate = 1.2
     , purchasePrice = 0
     , purchasePriceFormField = ""
+    , repairsAndMaintenanceExpensePercent = 10
     , ui =
         { isModalShown = False
         }
+    , vacancyRate = 5
     , zillowSearchAddressField = ""
     , zillowSearchResult = NotAsked
     }

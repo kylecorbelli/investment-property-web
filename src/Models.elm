@@ -50,6 +50,7 @@ type UnderlineStyle
 
 type alias Model =
     { assumedAnnualValueAppreciationRate : Float
+    , capitalExpendituresExpensePercent : Float
     , downPaymentPercent : Float -- will be 30 instead of 0.3
     , environment : Environment
     , errorMessage : String
@@ -64,7 +65,9 @@ type alias Model =
     , propertyTaxRate : Float
     , purchasePrice : Float
     , purchasePriceFormField : String
+    , repairsAndMaintenanceExpensePercent : Float
     , ui : UIModel
+    , vacancyRate : Float
     , zillowSearchAddressField : String
     , zillowSearchResult : WebData ZillowSearchResult
     }

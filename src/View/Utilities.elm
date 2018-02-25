@@ -17,14 +17,14 @@ onSubmit msg =
         (Decode.succeed msg)
 
 
-roundedString : Float -> String
+roundedString : Int -> Float -> String
 roundedString =
-    format roundedLocale
+    format << roundedLocale
 
 
-roundedLocale : Locale
-roundedLocale =
-    { usLocale | decimals = 0 }
+roundedLocale : Int -> Locale
+roundedLocale decimals =
+    { usLocale | decimals = decimals }
 
 
 dollarFormat : Float -> String
@@ -35,12 +35,20 @@ dollarFormat value =
     in
         case value < 0 of
             True ->
-                "($" ++ (removeNegativeSign << roundedString <| value) ++ ")"
+                "($" ++ (removeNegativeSign << roundedString 0 <| value) ++ ")"
 
             False ->
-                "$" ++ roundedString value
+                "$" ++ roundedString 0 value
 
 
-percentFormat : Float -> String
-percentFormat =
-    (flip String.append) "%" << roundedString
+ratioLocale : Locale
+ratioLocale =
+    { usLocale | decimals = 2 }
+
+percentFormat : Int -> Float -> String
+percentFormat decimals value =
+    roundedString decimals value ++ "%"
+
+inParens : String -> String
+inParens value =
+    "(" ++ value ++ ")"
