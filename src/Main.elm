@@ -7,7 +7,7 @@ import Msgs exposing (..)
 import RemoteData exposing (RemoteData(..))
 import Subscriptions exposing (subscriptions)
 import Update exposing (update)
-import View
+import View.Main exposing (view)
 
 
 determineEnvironment : String -> Environment
@@ -25,7 +25,8 @@ determineEnvironment environment =
 
 initialModel : Flags -> Model
 initialModel flags =
-    { assumedAnnualValueAppreciationRate = 4
+    { assumedAnnualValueAppreciationRate = 2
+    , capitalExpendituresExpensePercent = 10
     , downPaymentPercent = 30
     , environment = determineEnvironment flags.environment
     , errorMessage = ""
@@ -40,9 +41,11 @@ initialModel flags =
     , propertyTaxRate = 1.2
     , purchasePrice = 0
     , purchasePriceFormField = ""
+    , repairsAndMaintenanceExpensePercent = 10
     , ui =
         { isModalShown = False
         }
+    , vacancyRate = 5
     , zillowSearchAddressField = ""
     , zillowSearchResult = NotAsked
     }
@@ -65,7 +68,7 @@ init flags =
 main : Program Flags Model Msg
 main =
     Html.programWithFlags
-        { view = View.view >> toUnstyled
+        { view = view >> toUnstyled
         , init = init
         , update = update
         , subscriptions = subscriptions

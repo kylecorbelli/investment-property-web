@@ -25,6 +25,26 @@ taxesAndInsuranceMonthlyAmount homeInsuranceAnnualAmount propertyTaxAnnualAmount
     (homeInsuranceAnnualAmount + propertyTaxAnnualAmount) / 12
 
 
+vacancyAllowanceMonthly : Float -> Float -> Float
+vacancyAllowanceMonthly grossMonthlyRent vacancyRate =
+    grossMonthlyRent * vacancyRate / 100
+
+
+netMonthlyRent : Float -> Float -> Float
+netMonthlyRent grossMonthlyRent vacancyRate =
+    grossMonthlyRent - (vacancyAllowanceMonthly grossMonthlyRent vacancyRate)
+
+
+capitalExpendituresExpenseMonthly : Float -> Float -> Float
+capitalExpendituresExpenseMonthly grossMonthlyRent capitalExpendituresExpensePercent =
+    grossMonthlyRent * capitalExpendituresExpensePercent / 100
+
+
+repairsAndMaintenanceExpenseMonthly : Float -> Float -> Float
+repairsAndMaintenanceExpenseMonthly grossMonthlyRent repairsAndMaintenanceExpensePercent =
+    grossMonthlyRent * repairsAndMaintenanceExpensePercent / 100
+
+
 operatingExpensesMonthly : Float -> Float -> Float
 operatingExpensesMonthly grossMonthlyRent operatingExpensePercent =
     grossMonthlyRent * operatingExpensePercent / 100
@@ -48,23 +68,43 @@ mortgagePrincipalAndInterestMonthly interestRate mortgageTermInYears mortgageAmo
 
 
 totalMonthlyExpenses : Float -> Float -> Float -> Float -> Float
-totalMonthlyExpenses mortgagePrincipalAndInterestMonthly taxesAndInsuranceMonthlyAmount operatingExpensesMonthly propertyManagementExpensesMonthly =
+totalMonthlyExpenses taxesAndInsuranceMonthly capitalExpendituresExpenseMonthly repairsAndMaintenanceExpenseMonthly propertyManagementExpensesMonthly =
     List.sum
-        [ mortgagePrincipalAndInterestMonthly
-        , taxesAndInsuranceMonthlyAmount
-        , operatingExpensesMonthly
+        [ taxesAndInsuranceMonthly
+        , capitalExpendituresExpenseMonthly
+        , repairsAndMaintenanceExpenseMonthly
         , propertyManagementExpensesMonthly
         ]
 
 
+netMonthlyOperatingIncome : Float -> Float -> Float
+netMonthlyOperatingIncome netMonthlyRent totalMonthlyExpenses =
+    netMonthlyRent - totalMonthlyExpenses
+
+
 netMonthlyCashflow : Float -> Float -> Float
-netMonthlyCashflow grossMonthlyRent totalMonthlyExpenses =
-    grossMonthlyRent - totalMonthlyExpenses
+netMonthlyCashflow netMonthlyOperatingIncome mortgagePrincipalAndInterestMonthly =
+    netMonthlyOperatingIncome - mortgagePrincipalAndInterestMonthly
 
 
 netAnnualCashflow : Float -> Float
-netAnnualCashflow netMonthlyCashflow =
-    netMonthlyCashflow * 12
+netAnnualCashflow netMonthlyOperatingIncome =
+    netMonthlyOperatingIncome * 12
+
+
+grossRentMultiplier : Float -> Float -> Float
+grossRentMultiplier purchasePrice grossAnnualRent =
+    purchasePrice / grossAnnualRent
+
+
+capitalizationRate : Float -> Float -> Float
+capitalizationRate netOperatingIncomeAnnual marketValue =
+    100 * netOperatingIncomeAnnual / marketValue
+
+
+debtCoverageRatio : Float -> Float -> Float
+debtCoverageRatio netOperatingIncome debtService =
+    netOperatingIncome / debtService
 
 
 firstYearAppreciationAmount : Float -> Float -> Float

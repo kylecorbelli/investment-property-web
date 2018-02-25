@@ -46,7 +46,7 @@ zillowSearchResultDecoder =
         |> optionalPath [ "response", "results", "result", "bathrooms" ] (single float) 0
         |> optionalPath [ "response", "results", "result", "bedrooms" ] (single float) 0
         |> requiredPath [ "response", "results", "result", "rentzestimate" ] (single zillowZestimateDataDecoder)
-        |> requiredPath [ "response", "results", "result", "finishedSqFt" ] (single int)
+        |> optionalPath [ "response", "results", "result", "finishedSqFt" ] (single int) 0
         |> requiredPath [ "response", "results", "result", "zestimate" ] (single zillowZestimateDataDecoder)
 
 
