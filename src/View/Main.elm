@@ -1,7 +1,7 @@
 module View.Main exposing (..)
 
-import Html.Styled exposing (button, div, form, h1, h2, h3, Html, i, img, input, label, p, section, span, table, tbody, td, th, thead, text, tr)
-import Html.Styled.Attributes exposing (class, css, placeholder, src, type_, value)
+import Html.Styled exposing (a, button, div, form, h1, h2, h3, Html, i, img, input, label, p, section, span, table, tbody, td, th, thead, text, tr)
+import Html.Styled.Attributes exposing (class, css, href, placeholder, src, type_, value)
 import Models exposing (Model, ZillowSearchResult)
 import Msgs exposing (..)
 import View.AnalysisResults exposing (viewAnnualYieldAnalysis, viewMonthlyCashFlowAnalysis, viewMonthlyOperatingIncomeAnalysis, viewPropertyMetrics)

@@ -4,6 +4,7 @@ import API.Zillow exposing (zillowSearchResultRequest)
 import Constants exposing (errorMessageCountdownSeconds, genericErrorMessage)
 import Http exposing (Error(..))
 import Models exposing (..)
+import Routing exposing (parseLocation)
 import Msgs exposing (..)
 import RemoteData exposing (RemoteData(..))
 
@@ -150,3 +151,6 @@ update msg model =
 
         DismissZillowSearchResult ->
             { model | zillowSearchResult = NotAsked, zillowSearchAddressField = "" } ! []
+
+        LocationChanged location ->
+            { model | route = parseLocation location } ! []

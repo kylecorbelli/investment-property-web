@@ -3,8 +3,10 @@ module Main exposing (..)
 import Html exposing (Html)
 import Html.Styled exposing (toUnstyled)
 import Models exposing (Environment(..), Model)
+import Navigation exposing (Location, programWithFlags)
 import Msgs exposing (..)
 import RemoteData exposing (RemoteData(..))
+import Routing exposing (parseLocation, renderPage)
 import Subscriptions exposing (subscriptions)
 import Update exposing (update)
 import View.Main exposing (view)
@@ -23,8 +25,8 @@ determineEnvironment environment =
             Development
 
 
-initialModel : Flags -> Model
-initialModel flags =
+initialModel : Flags -> Location -> Model
+initialModel flags location =
     { assumedAnnualValueAppreciationRate = 2
     , capitalExpendituresExpensePercent = 10
     , downPaymentPercent = 30
@@ -42,6 +44,7 @@ initialModel flags =
     , purchasePrice = 0
     , purchasePriceFormField = ""
     , repairsAndMaintenanceExpensePercent = 10
+    , route = parseLocation location
     , ui =
         { isModalShown = False
         }
@@ -56,9 +59,9 @@ type alias Flags =
     }
 
 
-init : Flags -> ( Model, Cmd Msg )
-init flags =
-    initialModel flags ! []
+init : Flags -> Location -> ( Model, Cmd Msg )
+init flags location =
+    initialModel flags location ! []
 
 
 
@@ -67,8 +70,8 @@ init flags =
 
 main : Program Flags Model Msg
 main =
-    Html.programWithFlags
-        { view = view >> toUnstyled
+    programWithFlags LocationChanged
+        { view = renderPage >> toUnstyled
         , init = init
         , update = update
         , subscriptions = subscriptions

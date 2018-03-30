@@ -1,6 +1,7 @@
 module Msgs exposing (..)
 
 import Models exposing (..)
+import Navigation exposing (Location)
 import RemoteData exposing (WebData)
 
 type Msg
@@ -15,3 +16,4 @@ type Msg
     | ToggleModal
     | DismissZillowModal
     | DismissZillowSearchResult
+    | LocationChanged Location
