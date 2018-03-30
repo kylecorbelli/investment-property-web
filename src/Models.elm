@@ -66,8 +66,15 @@ type alias Model =
     , purchasePrice : Float
     , purchasePriceFormField : String
     , repairsAndMaintenanceExpensePercent : Float
+    , route : Route
     , ui : UIModel
     , vacancyRate : Float
     , zillowSearchAddressField : String
     , zillowSearchResult : WebData ZillowSearchResult
     }
+
+
+type Route
+    = Home
+    | SignUp
+    | NotFoundRoute
