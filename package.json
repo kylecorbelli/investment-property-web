@@ -8,7 +8,9 @@
   },
   "scripts": {
     "deploy": "elm-app build && cp build/index.html build/200.html && surge build --domain income-property-analysis.surge.sh",
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "start": "elm-app start",
+    "test": "elm-app test",
+    "test:watch": "elm-app test --watch"
   },
   "repository": {
     "type": "git",
