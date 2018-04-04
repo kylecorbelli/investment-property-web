@@ -1,7 +1,7 @@
 module View.ZillowSearchModal exposing (..)
 
 import Html.Styled exposing (button, div, form, h2, h3, Html, i, img, input, p, text)
-import Html.Styled.Attributes exposing (class, placeholder, src, type_)
+import Html.Styled.Attributes exposing (class, placeholder, src, type_, value)
 import Html.Styled.Events exposing (onClick, onInput)
 import Models exposing (Model, ZillowSearchResult)
 import Msgs exposing (Msg(..))
@@ -26,7 +26,7 @@ zillowSearchModalContent model =
                 _ ->
                     div []
                         [ h2 [ class "h2 mb4 tc" ] [ text "search for a property" ]
-                        , zillowSearchFormView
+                        , zillowSearchFormView model.zillowSearchAddressField
                         ]
     in
         div [ class "pa4 ph5-ns w-100" ]
@@ -69,10 +69,10 @@ zillowSearchResultsSuccessView { address, bathroomCount, bedroomCount, rentZesti
         ]
 
 
-zillowSearchFormView : Html Msg
-zillowSearchFormView =
+zillowSearchFormView : String -> Html Msg
+zillowSearchFormView zillowSearchAddressField =
     form [ class "ba b--silver flex w-100", onSubmit ZillowSearchResultsRequestSent ]
-        [ input [ class "bw0 flex-auto f4 outline-0 pa3", onInput UpdateZillowSearchAddressField, placeholder "address" ] []
+        [ input [ class "bw0 flex-auto f4 outline-0 pa3", onInput UpdateZillowSearchAddressField, placeholder "address", value zillowSearchAddressField ] []
         , button [ class "bg-green bw0 hover-bg-dark-green outline-0 ph4 pointer white", type_ "submit" ] [ text "Search" ]
         ]
 

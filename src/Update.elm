@@ -7,6 +7,18 @@ import Models exposing (..)
 import Routing exposing (parseLocation)
 import Msgs exposing (..)
 import RemoteData exposing (RemoteData(..))
+import Lenses
+    exposing
+        ( errorMessageCountdownLens
+        , errorMessageLens
+        , grossMonthlyRentLens
+        , grossMonthlyRentFormFieldLens
+        , isModalShownLens
+        , purchasePriceLens
+        , purchasePriceFormFieldLens
+        , zillowSearchAddressFieldLens
+        , zillowSearchResultLens
+        )
 
 
 update : Msg -> Model -> ( Model, Cmd Msg )
@@ -29,10 +41,9 @@ update msg model =
                 newModel =
                     case ( purchasePrice, grossMonthlyRent ) of
                         ( Ok pp, Ok gmr ) ->
-                            { model
-                                | purchasePrice = pp
-                                , grossMonthlyRent = gmr
-                            }
+                            model
+                                |> purchasePriceLens.set pp
+                                |> grossMonthlyRentLens.set gmr
 
                         _ ->
                             model
@@ -51,10 +62,9 @@ update msg model =
                         ""
 
                 updatedModel =
-                    { model
-                        | errorMessage = errorMessage
-                        , errorMessageCountdown = errorMessageCountdown
-                    }
+                    model
+                        |> errorMessageLens.set errorMessage
+                        |> errorMessageCountdownLens.set errorMessageCountdown
             in
                 updatedModel ! []
 
@@ -89,11 +99,10 @@ update msg model =
                             ( model.errorMessage, model.errorMessageCountdown )
 
                 newModel =
-                    { model
-                        | errorMessage = errorMessage
-                        , errorMessageCountdown = errorMessageCountdown
-                        , zillowSearchResult = result
-                    }
+                    model
+                        |> errorMessageLens.set errorMessage
+                        |> errorMessageCountdownLens.set errorMessageCountdown
+                        |> zillowSearchResultLens.set result
             in
                 newModel ! []
 
@@ -108,21 +117,14 @@ update msg model =
 
                                 rentZestimateAmount =
                                     zillowSearchResult.rentZestimateData.amount
-
-                                existingUi =
-                                    model.ui
-
-                                updatedUi =
-                                    { existingUi | isModalShown = False }
                             in
-                                { model
-                                    | purchasePrice = zestimateAmount |> toFloat
-                                    , grossMonthlyRent = rentZestimateAmount |> toFloat
-                                    , purchasePriceFormField = zestimateAmount |> toString
-                                    , grossMonthlyRentFormField = rentZestimateAmount |> toString
-                                    , ui = updatedUi
-                                    , zillowSearchResult = NotAsked
-                                }
+                                model
+                                    |> purchasePriceLens.set (toFloat zestimateAmount)
+                                    |> grossMonthlyRentLens.set (toFloat rentZestimateAmount)
+                                    |> purchasePriceFormFieldLens.set (toString zestimateAmount)
+                                    |> grossMonthlyRentFormFieldLens.set (toString rentZestimateAmount)
+                                    |> isModalShownLens.set False
+                                    |> zillowSearchResultLens.set NotAsked
 
                         _ ->
                             model
@@ -131,26 +133,30 @@ update msg model =
 
         ToggleModal ->
             let
-                existingUi =
-                    model.ui
-
-                updatedUi =
-                    { existingUi | isModalShown = (not existingUi.isModalShown) }
+                newModel =
+                    model
+                        |> isModalShownLens.set (isModalShownLens.get model |> not)
             in
-                { model | ui = updatedUi } ! []
+                newModel ! []
 
         DismissZillowModal ->
             let
-                existingUi =
-                    model.ui
-
-                updatedUi =
-                    { existingUi | isModalShown = False }
+                newModel =
+                    model
+                        |> zillowSearchAddressFieldLens.set ""
+                        |> zillowSearchResultLens.set NotAsked
+                        |> isModalShownLens.set False
             in
-                { model | ui = updatedUi, zillowSearchResult = NotAsked, zillowSearchAddressField = "" } ! []
+                newModel ! []
 
         DismissZillowSearchResult ->
-            { model | zillowSearchResult = NotAsked, zillowSearchAddressField = "" } ! []
+            let
+                newModel =
+                    model
+                        |> zillowSearchAddressFieldLens.set ""
+                        |> zillowSearchResultLens.set NotAsked
+            in
+                newModel ! []
 
         LocationChanged location ->
             { model | route = parseLocation location } ! []
