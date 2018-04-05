@@ -4,6 +4,7 @@ import API.Zillow exposing (zillowSearchResultRequest)
 import Constants exposing (errorMessageCountdownSeconds, genericErrorMessage)
 import Http exposing (Error(..))
 import Models exposing (..)
+import Ports exposing (gtmAnalyzeProperty, gtmPageView)
 import Routing exposing (parseLocation)
 import Msgs exposing (..)
 import RemoteData exposing (RemoteData(..))
@@ -48,7 +49,12 @@ update msg model =
                         _ ->
                             model
             in
-                newModel ! []
+                newModel
+                    ! [ gtmAnalyzeProperty
+                            { purchasePrice = model.purchasePriceFormField
+                            , grossMonthlyRent = model.grossMonthlyRentFormField
+                            }
+                      ]
 
         AdvanceErrorMessageCountdown ->
             let
@@ -159,4 +165,4 @@ update msg model =
                 newModel ! []
 
         LocationChanged location ->
-            { model | route = parseLocation location } ! []
+            { model | route = parseLocation location } ! [ gtmPageView location.hash ]

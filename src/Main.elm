@@ -1,15 +1,14 @@
 module Main exposing (..)
 
-import Html exposing (Html)
 import Html.Styled exposing (toUnstyled)
 import Models exposing (Environment(..), Model)
-import Navigation exposing (Location, programWithFlags)
 import Msgs exposing (..)
+import Navigation exposing (Location, programWithFlags)
+import Ports exposing (gtmPageView)
 import RemoteData exposing (RemoteData(..))
 import Routing exposing (parseLocation, renderPage)
 import Subscriptions exposing (subscriptions)
 import Update exposing (update)
-import View.Main exposing (view)
 
 
 determineEnvironment : String -> Environment
@@ -61,7 +60,7 @@ type alias Flags =
 
 init : Flags -> Location -> ( Model, Cmd Msg )
 init flags location =
-    initialModel flags location ! []
+    initialModel flags location ! [ gtmPageView location.hash ]
 
 
 
