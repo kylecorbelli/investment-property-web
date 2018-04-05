@@ -6,9 +6,7 @@ import Models exposing (Model, ZillowSearchResult)
 import Msgs exposing (..)
 import View.AnalysisResults exposing (viewAnnualYieldAnalysis, viewMonthlyCashFlowAnalysis, viewMonthlyOperatingIncomeAnalysis, viewPropertyMetrics)
 import View.ErrorMessageBanner exposing (errorMessageBannerView)
-import View.Modal exposing (modal)
 import View.PropertyDetailsInputs exposing (viewInputs)
-import View.ZillowSearchModal exposing (searchZillowButton, zillowSearchModalContent)
 
 
 view : Model -> Html Msg
@@ -29,6 +27,4 @@ view model =
                 , viewPropertyMetrics model
                 ]
             ]
-        , searchZillowButton
-        , modal model zillowSearchModalContent DismissZillowModal
         ]
